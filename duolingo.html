@@ -63,6 +63,10 @@
             color: #afafaf;
             transition: all 0.2s;
             box-shadow: 0 4px 0 var(--gray);
+            width: 200px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .tab-btn.active {
@@ -131,7 +135,7 @@
             background: var(--bg);
             border: 2px solid var(--gray);
             border-radius: 24px;
-            padding: 30px;
+            padding: 20px; 
             text-align: center;
             box-shadow: 0 8px 0 var(--gray);
             width: 100%;
@@ -145,25 +149,35 @@
         .word-image {
             width: 100%;
             max-width: 350px;
-            height: 350px;
+            height: 300px; 
             object-fit: contain; 
-            margin-bottom: 25px;
+            margin-bottom: 15px; 
             border-radius: 30px;
         }
 
         .word-en {
-            font-size: 32px;
+            font-size: 28px; 
             font-weight: 800;
-            margin-bottom: 10px;
             color: var(--text);
             text-align: center;
+            min-height: 65px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 5px;
         }
 
         .word-ru {
-            font-size: 20px;
+            font-size: 18px;
             color: #777;
-            margin-bottom: 25px;
             text-align: center;
+            min-height: 45px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 10px;
         }
 
         .controls-container {
@@ -201,7 +215,6 @@
             box-shadow: 0 0 0 transparent;
         }
 
-        /* Кнопка АВТОПЛЕЯ (Имитация видео) */
         .autoplay-btn {
             background: var(--warning);
             color: white;
@@ -237,32 +250,18 @@
             margin: 0 auto;
         }
 
-        @media (max-width: 600px) {
-            .match-container {
-                flex-direction: column;
-            }
-            .slider-wrapper {
-                gap: 10px;
-            }
-            .single-card {
-                padding: 20px;
-            }
-            .word-image {
-                height: 250px;
-            }
-        }
-
         .match-column {
             flex: 1;
             display: flex;
             flex-direction: column;
             gap: 15px;
+            width: 50%;
         }
 
         .match-btn {
             background: var(--bg);
             border: 2px solid var(--gray);
-            padding: 15px;
+            padding: 10px 15px;
             border-radius: 15px;
             font-size: 18px;
             font-weight: 700;
@@ -270,6 +269,11 @@
             transition: all 0.2s;
             box-shadow: 0 4px 0 var(--gray);
             text-align: center;
+            word-wrap: break-word;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 85px; 
         }
 
         .match-btn.selected {
@@ -295,6 +299,50 @@
             color: #ea2b2b;
             box-shadow: 0 4px 0 #ea2b2b;
             animation: shake 0.4s ease;
+        }
+
+        /* --- АДАПТАЦИЯ ПОД МОБИЛЬНЫЕ УСТРОЙСТВА --- */
+        @media (max-width: 600px) {
+            .tab-btn {
+                width: 140px; 
+                font-size: 16px;
+                padding: 10px;
+            }
+
+            .slider-wrapper {
+                gap: 10px;
+            }
+            .single-card {
+                padding: 15px; 
+            }
+            .word-image {
+                height: 180px; 
+                margin-bottom: 10px; 
+            }
+            .word-en {
+                font-size: 22px; 
+                min-height: 55px; 
+            }
+            .word-ru {
+                font-size: 16px; 
+                min-height: 40px;
+                margin-bottom: 10px; 
+            }
+            .play-btn {
+                width: 50px; 
+                height: 50px;
+                font-size: 24px;
+            }
+            
+            /* Игра */
+            .match-container {
+                gap: 10px; 
+            }
+            .match-btn {
+                font-size: 14px;
+                padding: 5px;
+                height: 70px; 
+            }
         }
 
         /* Анимации */
@@ -335,7 +383,7 @@
         <button class="tab-btn" onclick="switchTab('match')">🎮 Найди пару</button>
     </div>
 
-    <!-- Секция 1: Слайдер карточек (с режимом видео) -->
+    <!-- Секция 1: Слайдер карточек -->
     <div id="learn" class="section active">
         <div class="slider-wrapper">
             <button class="nav-btn" id="prev-btn" onclick="prevCard()">&#10094;</button>
@@ -349,7 +397,6 @@
         
         <div class="controls-container">
             <div class="progress-text" id="card-progress">1 / 20</div>
-            <!-- Кнопка, которая заменяет ей видео -->
             <button class="autoplay-btn" id="autoplay-btn" onclick="toggleAutoplay()">
                 ▶️ Слайдшоу
             </button>
@@ -367,7 +414,7 @@
 
     <script>
         const words = [
-            { en: "cybercrime", ru: "киберпреступность", img: "cybercrime.png" },
+            { en: "cybercrime", ru: "киберпреступность", img: "cybercrime.png", speech: "cyber crime" },
             { en: "a device", ru: "устройство", img: "device.png" },
             { en: "a network device", ru: "сетевое устройство", img: "network_device.png" },
             { en: "hardware", ru: "аппаратное обеспечение", img: "hardware.png" },
@@ -380,13 +427,13 @@
             { en: "data", ru: "данные", img: "data.png" }, 
             { en: "personal data", ru: "персональные данные", img: "personal_data.png" }, 
             { en: "payment data", ru: "платежные данные", img: "payment_data.png" }, 
-            { en: "an access", ru: "доступ", img: "access.png" }, 
-            { en: "an unauthorized access", ru: "несанкционированный доступ", img: "unauth.png" }, 
-            { en: "to access", ru: "получать доступ", img: "to_access.png" }, 
-            { en: "a username", ru: "имя пользователя", img: "username.png" }, 
+            { en: "an access", ru: "доступ", img: "access.png" },
+            { en: "an unauthorized access", ru: "несанкционированный доступ", img: "unauth.png" },
+            { en: "to access", ru: "получать доступ", img: "to_access.png", speech: "to ak-SESS" }, 
+            { en: "a username (login)", ru: "имя пользователя", img: "username.png" }, 
             { en: "a password", ru: "пароль", img: "password.png" }, 
             { en: "login credentials", ru: "реквизиты доступа", img: "login.png" }, 
-            { en: "a cyber attack", ru: "кибератака", img: "cyber_attack.png" } 
+            { en: "a cyber attack", ru: "кибератака", img: "cyber_attack.png", speech: "cyber attack" } 
         ];
 
         const matchWords = [
@@ -402,36 +449,50 @@
             { en: "a password", ru: "пароль" }
         ];
 
-        // --- ФУНКЦИЯ ОЗВУЧКИ ---
-        function speak(text) {
+        function speak(text, speechOverride) {
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); // Останавливаем предыдущую речь
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US';
-                utterance.rate = 0.85; // Чуть медленнее для четкости
+                window.speechSynthesis.cancel(); 
+                
+                const textToRead = speechOverride || text;
+                const utterance = new SpeechSynthesisUtterance(textToRead);
+                
+                utterance.lang = 'en-GB'; 
+                utterance.rate = 0.85; 
+
+                const voices = window.speechSynthesis.getVoices();
+                const ukVoice = voices.find(voice => voice.lang === 'en-GB' || voice.name.includes('UK'));
+                if (ukVoice) {
+                    utterance.voice = ukVoice;
+                }
+
                 window.speechSynthesis.speak(utterance);
             } else {
                 alert("Ваш браузер не поддерживает озвучку текста.");
             }
         }
 
-        // --- ЛОГИКА СЛАЙДЕРА И АВТОПЛЕЯ ---
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
+        }
+
         let currentCardIndex = 0;
         let autoplayInterval = null;
         let isAutoplaying = false;
 
-        function showCard(index, autoSpeak = false) {
+        function showCard(index, autoSpeak = true) { 
             const container = document.getElementById('single-card-container');
             const word = words[index];
             
             const fallbackImg = 'https://placehold.co/350x350/e5e5e5/777777?text=No+Photo';
+
+            const speechParam = word.speech ? `'${word.en}', '${word.speech}'` : `'${word.en}'`;
 
             container.innerHTML = `
                 <div class="single-card">
                     <img src="${word.img}" alt="${word.en}" class="word-image" onerror="this.onerror=null; this.src='${fallbackImg}';">
                     <div class="word-en">${word.en}</div>
                     <div class="word-ru">${word.ru}</div>
-                    <button class="play-btn" onclick="speak('${word.en}')">🔊</button>
+                    <button class="play-btn" onclick="speak(${speechParam})">🔊</button>
                 </div>
             `;
 
@@ -440,47 +501,43 @@
             document.getElementById('next-btn').disabled = index === words.length - 1;
 
             if (autoSpeak) {
-                speak(word.en);
+                speak(word.en, word.speech);
             }
         }
 
         function nextCard() {
             if (currentCardIndex < words.length - 1) {
                 currentCardIndex++;
-                showCard(currentCardIndex, isAutoplaying); // Озвучиваем автоматически, если включен автоплей
+                showCard(currentCardIndex, true); 
             } else if (isAutoplaying) {
-                stopAutoplay(); // Останавливаем видео в конце
+                stopAutoplay(); 
             }
         }
 
         function prevCard() {
             if (currentCardIndex > 0) {
                 currentCardIndex--;
-                showCard(currentCardIndex);
-                if (isAutoplaying) stopAutoplay(); // Если юзер нажал назад, выключаем автоплей
+                showCard(currentCardIndex, true); 
+                if (isAutoplaying) stopAutoplay(); 
             }
         }
 
-        // Логика кнопки "Смотреть как видео"
         function toggleAutoplay() {
             const btn = document.getElementById('autoplay-btn');
             
             if (isAutoplaying) {
                 stopAutoplay();
             } else {
-                // Запуск автоплея
                 isAutoplaying = true;
                 btn.innerHTML = '⏸ Остановить';
                 btn.classList.add('playing');
                 
-                // Если были в конце, начинаем сначала
                 if (currentCardIndex === words.length - 1) {
                     currentCardIndex = 0;
                 }
                 
-                showCard(currentCardIndex, true); // Показываем и озвучиваем текущую
+                showCard(currentCardIndex, true); 
                 
-                // Таймер: каждые 4 секунды листаем дальше
                 autoplayInterval = setInterval(() => {
                     nextCard();
                 }, 4000);
@@ -508,7 +565,6 @@
             }
         });
 
-        // --- ЛОГИКА ИГРЫ "НАЙДИ ПАРУ" ---
         let selectedEn = null;
         let selectedRu = null;
         let matchedCount = 0;
@@ -528,7 +584,11 @@
                 const btn = document.createElement('button');
                 btn.className = 'match-btn';
                 btn.innerText = text;
-                btn.onclick = () => handleMatchClick(btn, 'en', text);
+                
+                const wordObj = words.find(w => w.en === text);
+                const speechOverride = wordObj ? wordObj.speech : null;
+
+                btn.onclick = () => handleMatchClick(btn, 'en', text, speechOverride);
                 colEn.appendChild(btn);
             });
 
@@ -541,7 +601,7 @@
             });
         }
 
-        function handleMatchClick(btn, lang, text) {
+        function handleMatchClick(btn, lang, text, speechOverride = null) {
             if (btn.classList.contains('correct')) return;
 
             const colId = lang === 'en' ? 'col-en' : 'col-ru';
@@ -551,7 +611,7 @@
 
             if (lang === 'en') {
                 selectedEn = { btn, text };
-                speak(text); 
+                speak(text, speechOverride); 
             } else {
                 selectedRu = { btn, text };
             }
@@ -591,9 +651,8 @@
             selectedRu = null;
         }
 
-        // --- ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ---
         function switchTab(tabId) {
-            if (isAutoplaying) stopAutoplay(); // Выключаем видео, если ушли на другую вкладку
+            if (isAutoplaying) stopAutoplay(); 
 
             document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -602,9 +661,8 @@
             event.target.classList.add('active');
         }
 
-        // Инициализация при загрузке
         window.onload = () => {
-            showCard(0); 
+            showCard(0, false); 
             renderMatchGame();
         };
     </script>
