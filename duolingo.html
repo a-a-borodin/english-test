@@ -49,6 +49,7 @@
             margin-bottom: 30px;
             flex-wrap: wrap;
             justify-content: center;
+            max-width: 1000px;
         }
 
         .tab-btn {
@@ -255,6 +256,62 @@
             box-shadow: 0 6px 0 #cc0000;
         }
 
+        /* Стили для ввода текста (Написание) */
+        .spell-input-group {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            max-width: 500px;
+            margin-top: 10px;
+        }
+
+        .spell-input {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 22px;
+            border: 2px solid var(--gray);
+            border-radius: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .spell-input:focus {
+            border-color: var(--secondary);
+        }
+
+        .check-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 16px;
+            font-size: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 0 var(--primary-dark);
+            transition: all 0.1s;
+        }
+
+        .check-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 0 0 transparent;
+        }
+
+        .spell-feedback {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: 800;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feedback-correct { color: var(--primary); animation: popIn 0.3s ease; }
+        .feedback-wrong { color: var(--error); animation: shake 0.4s ease; }
+
         .match-container {
             display: flex;
             justify-content: space-between;
@@ -322,7 +379,8 @@
                 flex-direction: column;
                 padding: 20px;
                 gap: 15px;
-                height: 540px;
+                height: auto;
+                min-height: 540px;
                 justify-content: flex-start;
             }
 
@@ -338,39 +396,31 @@
             }
 
             .card-text-wrapper {
-                height: 260px;
+                height: auto;
                 width: 100%;
                 flex: none;
                 justify-content: flex-start;
             }
 
-            .word-en { 
-                font-size: 32px; 
-                height: 80px;
-            }
-            
-            .word-ru { 
-                font-size: 20px; 
-                height: 60px;
-                margin-bottom: 15px;
-            }
-            
-            .play-btn {
-                width: 60px; height: 60px; font-size: 28px;
-            }
+            .word-en { font-size: 32px; height: 80px; }
+            .word-ru { font-size: 20px; height: 60px; margin-bottom: 15px; }
+            .play-btn { width: 60px; height: 60px; font-size: 28px; }
 
             .slider-wrapper { gap: 15px; }
             .nav-btn { width: 50px; height: 50px; font-size: 24px; }
             
             .match-container { gap: 15px; }
             .match-btn { font-size: 16px; min-height: 75px; padding: 10px; }
+
+            .spell-input-group { flex-direction: column; }
+            .spell-input { width: 100%; }
+            .check-btn { width: 100%; }
         }
 
         @media (max-width: 500px) {
             .tab-btn { width: 100%; font-size: 16px; padding: 10px; }
-            .single-card { height: 480px; padding: 15px; }
+            .single-card { min-height: 480px; padding: 15px; }
             .card-image-wrapper { height: 160px; }
-            .card-text-wrapper { height: 240px; }
             .word-en { font-size: 26px; height: 70px; }
             .word-ru { font-size: 18px; height: 50px; margin-bottom: 15px; }
             .nav-btn { width: 40px; height: 40px; font-size: 18px; }
@@ -411,19 +461,18 @@
 
     <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('learn')">📚 Лексика</button>
+        <button class="tab-btn" onclick="switchTab('pronounce')">🗣 Произношение</button>
+        <button class="tab-btn" onclick="switchTab('spell')">✍️ Написание</button>
         <button class="tab-btn" onclick="switchTab('match')">🎮 Найди пару</button>
     </div>
 
+    <!-- Вкладка 1: Лексика (с автоозвучкой) -->
     <div id="learn" class="section active">
         <div class="slider-wrapper">
             <button class="nav-btn" id="prev-btn" onclick="prevCard()">&#10094;</button>
-            
-            <div id="single-card-container" style="width: 100%; display: flex; justify-content: center;">
-            </div>
-
+            <div id="single-card-container" style="width: 100%; display: flex; justify-content: center;"></div>
             <button class="nav-btn" id="next-btn" onclick="nextCard()">&#10095;</button>
         </div>
-        
         <div class="controls-container">
             <div class="progress-text" id="card-progress">1 / 20</div>
             <button class="autoplay-btn" id="autoplay-btn" onclick="toggleAutoplay()">
@@ -432,7 +481,48 @@
         </div>
     </div>
 
+    <!-- Вкладка 2: Произношение (без автоозвучки) -->
+    <div id="pronounce" class="section">
+        <div class="slider-wrapper">
+            <button class="nav-btn" id="prev-pronounce-btn" onclick="prevPronounceCard()">&#10094;</button>
+            <div id="pronounce-card-container" style="width: 100%; display: flex; justify-content: center;"></div>
+            <button class="nav-btn" id="next-pronounce-btn" onclick="nextPronounceCard()">&#10095;</button>
+        </div>
+        <div class="controls-container">
+            <div class="progress-text" id="pronounce-progress">1 / 20</div>
+        </div>
+    </div>
+
+    <!-- Вкладка 3: Написание -->
+    <div id="spell" class="section">
+        <div class="slider-wrapper">
+            <button class="nav-btn" id="prev-spell-btn" onclick="prevSpellCard()">&#10094;</button>
+            
+            <div class="single-card" style="flex-direction: column; justify-content: center;">
+                <img id="spell-img" class="word-image" style="height: 200px; width: auto; margin-bottom: 10px;">
+                <div id="spell-ru" class="word-ru" style="height: auto; margin-bottom: 10px; font-size: 24px;"></div>
+                
+                <div class="spell-input-group">
+                    <input type="text" id="spell-input" class="spell-input" placeholder="Напишите по-английски..." autocomplete="off">
+                    <button class="check-btn" onclick="checkSpelling()">Проверить</button>
+                </div>
+                <div id="spell-feedback" class="spell-feedback"></div>
+            </div>
+
+            <button class="nav-btn" id="next-spell-btn" onclick="nextSpellCard()">&#10095;</button>
+        </div>
+        <div class="controls-container">
+            <div class="progress-text" id="spell-progress">1 / 20</div>
+        </div>
+    </div>
+
+    <!-- Вкладка 4: Найди пару -->
     <div id="match" class="section">
+        <div style="text-align: center; margin-bottom: 25px;">
+            <button class="autoplay-btn" style="margin: 0 auto; background: var(--secondary); box-shadow: 0 6px 0 var(--secondary-dark);" onclick="restartMatch()">
+                🔄 Перезапустить игру
+            </button>
+        </div>
         <div class="match-container">
             <div class="match-column" id="col-en"></div>
             <div class="match-column" id="col-ru"></div>
@@ -503,6 +593,7 @@
             window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
         }
 
+        // --- ЛОГИКА ВКЛАДКИ "ЛЕКСИКА" ---
         let currentCardIndex = 0;
         let autoplayInterval = null;
         let isAutoplaying = false;
@@ -510,9 +601,7 @@
         function showCard(index, autoSpeak = true) { 
             const container = document.getElementById('single-card-container');
             const word = words[index];
-            
             const fallbackImg = 'https://placehold.co/450x350/e5e5e5/777777?text=No+Photo';
-
             const speechParam = word.speech ? `'${word.en}', '${word.speech}'` : `'${word.en}'`;
 
             container.innerHTML = `
@@ -532,9 +621,7 @@
             document.getElementById('prev-btn').disabled = index === 0;
             document.getElementById('next-btn').disabled = index === words.length - 1;
 
-            if (autoSpeak) {
-                speak(word.en, word.speech);
-            }
+            if (autoSpeak) speak(word.en, word.speech);
         }
 
         function nextCard() {
@@ -556,23 +643,15 @@
 
         function toggleAutoplay() {
             const btn = document.getElementById('autoplay-btn');
-            
             if (isAutoplaying) {
                 stopAutoplay();
             } else {
                 isAutoplaying = true;
                 btn.innerHTML = '⏸ Остановить';
                 btn.classList.add('playing');
-                
-                if (currentCardIndex === words.length - 1) {
-                    currentCardIndex = 0;
-                }
-                
+                if (currentCardIndex === words.length - 1) currentCardIndex = 0;
                 showCard(currentCardIndex, true); 
-                
-                autoplayInterval = setInterval(() => {
-                    nextCard();
-                }, 4000);
+                autoplayInterval = setInterval(() => { nextCard(); }, 4000);
             }
         }
 
@@ -584,19 +663,125 @@
             btn.classList.remove('playing');
         }
 
-        document.addEventListener('keydown', function(event) {
-            if (document.getElementById('learn').classList.contains('active')) {
-                if (event.key === 'ArrowRight') {
-                    if (isAutoplaying) stopAutoplay();
-                    nextCard();
-                }
-                if (event.key === 'ArrowLeft') {
-                    if (isAutoplaying) stopAutoplay();
-                    prevCard();
-                }
+        // --- ЛОГИКА ВКЛАДКИ "ПРОИЗНОШЕНИЕ" ---
+        let currentPronounceIndex = 0;
+
+        function showPronounceCard(index) { 
+            const container = document.getElementById('pronounce-card-container');
+            const word = words[index];
+            const fallbackImg = 'https://placehold.co/450x350/e5e5e5/777777?text=No+Photo';
+            const speechParam = word.speech ? `'${word.en}', '${word.speech}'` : `'${word.en}'`;
+
+            container.innerHTML = `
+                <div class="single-card">
+                    <div class="card-image-wrapper">
+                        <img src="${word.img}" alt="${word.en}" class="word-image" onerror="this.onerror=null; this.src='${fallbackImg}';">
+                    </div>
+                    <div class="card-text-wrapper">
+                        <div class="word-en">${word.en}</div>
+                        <div class="word-ru">${word.ru}</div>
+                        <button class="play-btn" onclick="speak(${speechParam})">🔊</button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('pronounce-progress').innerText = `${index + 1} / ${words.length}`;
+            document.getElementById('prev-pronounce-btn').disabled = index === 0;
+            document.getElementById('next-pronounce-btn').disabled = index === words.length - 1;
+        }
+
+        function nextPronounceCard() {
+            if (currentPronounceIndex < words.length - 1) {
+                currentPronounceIndex++;
+                showPronounceCard(currentPronounceIndex); 
             }
+        }
+
+        function prevPronounceCard() {
+            if (currentPronounceIndex > 0) {
+                currentPronounceIndex--;
+                showPronounceCard(currentPronounceIndex); 
+            }
+        }
+
+        // --- ЛОГИКА ВКЛАДКИ "НАПИСАНИЕ" ---
+        let currentSpellIndex = 0;
+
+        function showSpellCard(index) {
+            const word = words[index];
+            const fallbackImg = 'https://placehold.co/450x350/e5e5e5/777777?text=No+Photo';
+            
+            const imgEl = document.getElementById('spell-img');
+            imgEl.src = word.img;
+            imgEl.onerror = function() { this.onerror=null; this.src=fallbackImg; };
+            
+            document.getElementById('spell-ru').innerText = word.ru;
+            
+            const inputEl = document.getElementById('spell-input');
+            inputEl.value = '';
+            inputEl.disabled = false;
+            inputEl.focus();
+
+            const feedbackEl = document.getElementById('spell-feedback');
+            feedbackEl.innerText = '';
+            feedbackEl.className = 'spell-feedback';
+            
+            document.getElementById('spell-progress').innerText = `${index + 1} / ${words.length}`;
+            document.getElementById('prev-spell-btn').disabled = index === 0;
+            document.getElementById('next-spell-btn').disabled = index === words.length - 1;
+        }
+
+        function nextSpellCard() {
+            if (currentSpellIndex < words.length - 1) {
+                currentSpellIndex++;
+                showSpellCard(currentSpellIndex);
+            }
+        }
+
+        function prevSpellCard() {
+            if (currentSpellIndex > 0) {
+                currentSpellIndex--;
+                showSpellCard(currentSpellIndex);
+            }
+        }
+
+        function checkSpelling() {
+            const inputEl = document.getElementById('spell-input');
+            const inputVal = inputEl.value.trim().toLowerCase();
+            const correctWord = words[currentSpellIndex].en.toLowerCase();
+            const feedback = document.getElementById('spell-feedback');
+            
+            if (!inputVal) return;
+
+            // Убираем артикли и частицу to для более мягкой проверки
+            const cleanInput = inputVal.replace(/^(a |an |to )/i, '').trim();
+            const cleanCorrect = correctWord.replace(/^(a |an |to )/i, '').trim();
+
+            if (inputVal === correctWord || cleanInput === cleanCorrect) {
+                feedback.innerText = '✅ Верно!';
+                feedback.className = 'spell-feedback feedback-correct';
+                inputEl.disabled = true;
+                speak(words[currentSpellIndex].en, words[currentSpellIndex].speech);
+                
+                setTimeout(() => {
+                    if(currentSpellIndex < words.length - 1) nextSpellCard();
+                }, 1500);
+            } else {
+                feedback.innerText = '❌ Ошибка, попробуйте еще раз';
+                feedback.className = 'spell-feedback feedback-wrong';
+                setTimeout(() => {
+                    feedback.innerText = '';
+                    feedback.className = 'spell-feedback';
+                }, 2000);
+            }
+        }
+
+        // Обработка Enter в поле ввода
+        document.getElementById('spell-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') checkSpelling();
         });
 
+        // --- ЛОГИКА ИГРЫ "НАЙДИ ПАРУ" ---
         let selectedEn = null;
         let selectedRu = null;
         let matchedCount = 0;
@@ -609,6 +794,9 @@
             const colEn = document.getElementById('col-en');
             const colRu = document.getElementById('col-ru');
             
+            colEn.innerHTML = '';
+            colRu.innerHTML = '';
+
             const enList = shuffle([...matchWords.map(w => w.en)]);
             const ruList = shuffle([...matchWords.map(w => w.ru)]);
 
@@ -683,6 +871,15 @@
             selectedRu = null;
         }
 
+        function restartMatch() {
+            matchedCount = 0;
+            selectedEn = null;
+            selectedRu = null;
+            document.getElementById('success-msg').style.display = 'none';
+            renderMatchGame();
+        }
+
+        // --- ОБЩАЯ ЛОГИКА ---
         function switchTab(tabId) {
             if (isAutoplaying) stopAutoplay(); 
 
@@ -691,10 +888,34 @@
             
             document.getElementById(tabId).classList.add('active');
             event.target.classList.add('active');
+
+            // Фокус на инпут при переходе на вкладку Написание
+            if (tabId === 'spell') {
+                document.getElementById('spell-input').focus();
+            }
         }
+
+        // Управление стрелками на клавиатуре
+        document.addEventListener('keydown', function(event) {
+            if (document.getElementById('learn').classList.contains('active')) {
+                if (event.key === 'ArrowRight') { if (isAutoplaying) stopAutoplay(); nextCard(); }
+                if (event.key === 'ArrowLeft') { if (isAutoplaying) stopAutoplay(); prevCard(); }
+            } else if (document.getElementById('pronounce').classList.contains('active')) {
+                if (event.key === 'ArrowRight') nextPronounceCard();
+                if (event.key === 'ArrowLeft') prevPronounceCard();
+            } else if (document.getElementById('spell').classList.contains('active')) {
+                // В написании стрелки работают только если фокус не в поле ввода (чтобы можно было редактировать текст)
+                if (document.activeElement !== document.getElementById('spell-input')) {
+                    if (event.key === 'ArrowRight') nextSpellCard();
+                    if (event.key === 'ArrowLeft') prevSpellCard();
+                }
+            }
+        });
 
         window.onload = () => {
             showCard(0, false); 
+            showPronounceCard(0);
+            showSpellCard(0);
             renderMatchGame();
         };
     </script>
