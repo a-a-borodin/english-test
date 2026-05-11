@@ -548,9 +548,9 @@
             { en: "an access", ru: "доступ", img: "access.png" },
             { en: "an unauthorized access", ru: "несанкционированный доступ", img: "unauth.png" },
             { en: "to access", ru: "получать доступ", img: "to_access.png", speech: "to ak-SESS" }, 
-            { en: "a username (login)", ru: "имя пользователя", img: "username.png" }, 
+            { en: "a username (login)", ru: "имя пользователя", img: "username.png", accepted: ["username", "login", "a username", "a login", "username (login)"] }, 
             { en: "a password", ru: "пароль", img: "password.png"}, 
-            { en: "login credentials", ru: "реквизиты доступа", img: "login.png" }, 
+            { en: "login credentials", ru: "реквизиты доступа", img: "login.png", accepted: ["login credential"] }, 
             { en: "a cyber attack", ru: "кибератака", img: "cyber_attack.png", speech: "cyber attack" } 
         ];
 
@@ -747,21 +747,35 @@
 
         function checkSpelling() {
             const inputEl = document.getElementById('spell-input');
-            const inputVal = inputEl.value.trim().toLowerCase();
-            const correctWord = words[currentSpellIndex].en.toLowerCase();
+            let inputVal = inputEl.value.trim().toLowerCase().replace(/\s+/g, ' ');
+            
+            const currentWordObj = words[currentSpellIndex];
+            const correctWord = currentWordObj.en.toLowerCase();
             const feedback = document.getElementById('spell-feedback');
             
             if (!inputVal) return;
 
-            // Убираем артикли и частицу to для более мягкой проверки
             const cleanInput = inputVal.replace(/^(a |an |to )/i, '').trim();
             const cleanCorrect = correctWord.replace(/^(a |an |to )/i, '').trim();
 
+            let isCorrect = false;
+
             if (inputVal === correctWord || cleanInput === cleanCorrect) {
+                isCorrect = true;
+            }
+
+            if (!isCorrect && currentWordObj.accepted) {
+                const acceptedList = currentWordObj.accepted.map(w => w.toLowerCase());
+                if (acceptedList.includes(inputVal) || acceptedList.includes(cleanInput)) {
+                    isCorrect = true;
+                }
+            }
+
+            if (isCorrect) {
                 feedback.innerText = '✅ Верно!';
                 feedback.className = 'spell-feedback feedback-correct';
                 inputEl.disabled = true;
-                speak(words[currentSpellIndex].en, words[currentSpellIndex].speech);
+                speak(currentWordObj.en, currentWordObj.speech);
                 
                 setTimeout(() => {
                     if(currentSpellIndex < words.length - 1) nextSpellCard();
