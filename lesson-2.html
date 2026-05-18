@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity Lesson: Crimes & Methods</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 100%);
+            min-height: 100vh;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid #334155;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .reveal-anim {
+            animation: fadeInDown 0.4s ease-out forwards;
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .option-btn {
+            transition: all 0.2s ease;
+        }
+        .option-btn:hover:not(:disabled) {
+            transform: translateX(5px);
+            border-color: #38bdf8;
+            box-shadow: -4px 0 0 #38bdf8;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center py-10 px-4">
+
+    <!-- Header -->
+    <header class="text-center mb-10">
+        <h1 class="text-4xl font-extrabold text-sky-400 mb-2 tracking-wider uppercase drop-shadow-lg">
+            <i class="fa-solid fa-shield-halved mr-2"></i> Cybersecurity Essentials
+        </h1>
+        <p class="text-slate-400 text-lg">Cybercrimes and Cyber Methods</p>
+    </header>
+
+    <!-- MAIN MENU -->
+    <div id="main-menu" class="glass-panel rounded-2xl p-10 w-full max-w-3xl text-center">
+        <h2 class="text-2xl font-semibold mb-8 text-white">Select Lesson Module:</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <button onclick="startTerminology()" class="group relative bg-slate-800 hover:bg-sky-900 text-white p-8 rounded-xl transition-all border border-slate-600 hover:border-sky-400 overflow-hidden">
+                <div class="absolute inset-0 bg-sky-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                <i class="fa-solid fa-book-open text-4xl text-sky-400 mb-4 block"></i>
+                <h3 class="text-xl font-bold mb-2">1. Terminology</h3>
+                <p class="text-sm text-slate-400">Read definitions, guess the translation, and reveal the answer.</p>
+            </button>
+            
+            <button onclick="startQuiz()" class="group relative bg-slate-800 hover:bg-emerald-900 text-white p-8 rounded-xl transition-all border border-slate-600 hover:border-emerald-400 overflow-hidden">
+                <div class="absolute inset-0 bg-emerald-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                <i class="fa-solid fa-gamepad text-4xl text-emerald-400 mb-4 block"></i>
+                <h3 class="text-xl font-bold mb-2">2. Cyber Cases Quiz</h3>
+                <p class="text-sm text-slate-400">Match 20 short case descriptions with the correct cybercrime.</p>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODULE 1: TERMINOLOGY REVEAL -->
+    <div id="term-container" class="glass-panel rounded-2xl p-8 w-full max-w-4xl hidden">
+        <div class="flex justify-between items-center mb-6 border-b border-slate-600 pb-4">
+            <h2 class="text-xl font-bold text-sky-400">
+                <i class="fa-solid fa-graduation-cap mr-2"></i> Terminology Study
+            </h2>
+            <div class="flex items-center gap-4">
+                <span id="term-progress" class="text-slate-300 font-mono bg-slate-800 px-3 py-1 rounded-lg border border-slate-600">1/16</span>
+                <button onclick="showMenu()" class="text-slate-400 hover:text-white text-sm underline"><i class="fa-solid fa-house"></i> Menu</button>
+            </div>
+        </div>
+
+        <div class="min-h-[250px] flex flex-col justify-center items-center text-center mb-8">
+            <h3 id="term-en" class="text-4xl font-extrabold text-white mb-6 text-sky-300"></h3>
+            <p id="term-def" class="text-xl text-slate-300 leading-relaxed max-w-2xl"></p>
+            
+            <div class="mt-8 w-full">
+                <button id="btn-reveal" onclick="revealTranslation()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-xl transition-colors shadow-[0_0_15px_rgba(79,70,229,0.4)]">
+                    <i class="fa-solid fa-eye mr-2"></i> Show Correct Translation
+                </button>
+                
+                <div id="term-ru-container" class="hidden mt-6 p-6 bg-slate-800/80 border-2 border-emerald-500/50 rounded-xl">
+                    <p class="text-sm text-emerald-400 uppercase tracking-widest mb-1 font-bold">Russian Translation:</p>
+                    <p id="term-ru" class="text-3xl font-bold text-white"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-between mt-8 pt-6 border-t border-slate-700">
+            <button id="btn-prev-term" onclick="prevTerm()" class="bg-slate-700 hover:bg-slate-600 text-white py-2 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fa-solid fa-arrow-left mr-2"></i> Previous
+            </button>
+            <button id="btn-next-term" onclick="nextTerm()" class="bg-sky-600 hover:bg-sky-500 text-white py-2 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                Next <i class="fa-solid fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODULE 2: QUIZ -->
+    <div id="quiz-container" class="glass-panel rounded-2xl p-8 w-full max-w-4xl hidden">
+        <div class="flex justify-between items-center mb-6 border-b border-slate-600 pb-4">
+            <h2 class="text-xl font-bold text-emerald-400">
+                <i class="fa-solid fa-user-secret mr-2"></i> Case Analysis
+            </h2>
+            <div class="flex items-center gap-4">
+                <span id="quiz-score" class="text-emerald-400 font-bold bg-emerald-900/30 px-3 py-1 rounded-lg border border-emerald-500/30">Score: 0</span>
+                <span id="quiz-progress" class="text-slate-300 font-mono bg-slate-800 px-3 py-1 rounded-lg border border-slate-600">1/20</span>
+                <button onclick="showMenu()" class="text-slate-400 hover:text-white text-sm underline"><i class="fa-solid fa-house"></i> Menu</button>
+            </div>
+        </div>
+
+        <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-600 mb-8">
+            <p class="text-slate-400 text-sm uppercase tracking-widest mb-2"><i class="fa-solid fa-file-lines mr-1"></i> Incident Report:</p>
+            <p id="quiz-question" class="text-2xl text-white leading-relaxed"></p>
+        </div>
+
+        <div id="quiz-options" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Options generated by JS -->
+        </div>
+    </div>
+
+    <!-- RESULTS SCREEN -->
+    <div id="results-container" class="glass-panel rounded-2xl p-10 w-full max-w-2xl hidden text-center">
+        <i class="fa-solid fa-trophy text-6xl text-yellow-400 mb-6 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]"></i>
+        <h2 class="text-4xl font-bold text-white mb-2">Quiz Completed!</h2>
+        <p class="text-slate-400 mb-8 text-lg">Here is your performance report.</p>
+        
+        <div class="bg-slate-800 p-8 rounded-2xl border border-slate-600 mb-8 inline-block min-w-[250px]">
+            <p class="text-slate-400 uppercase tracking-widest mb-2">Final Score</p>
+            <p id="res-score" class="text-6xl font-black text-sky-400"></p>
+        </div>
+
+        <div class="w-full bg-slate-700 rounded-full h-4 mb-2">
+            <div id="res-bar" class="bg-emerald-500 h-4 rounded-full transition-all duration-1000" style="width: 0%"></div>
+        </div>
+        <p id="res-percent" class="text-right text-sm text-slate-400 font-bold mb-8">0% Accuracy</p>
+
+        <button onclick="showMenu()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold py-4 px-10 rounded-xl transition-colors shadow-lg">
+            <i class="fa-solid fa-rotate-left mr-2"></i> Return to Menu
+        </button>
+    </div>
+
+    <script>
+        // --- DATA FROM TEACHER'S FILES ---
+
+        // File 1: Terminology
+        const termsData = [
+            { en: "a DoS attack", ru: "DoS-атака (сетевая атака)", def: "is a cyber attack carried out with one Internet-connected device and aimed to disrupt legitimate users’ access to a target network or web resource." },
+            { en: "a DDoS attack", ru: "DDoS-атака (распределенная сетевая атака)", def: "is a cyber attack carried out with networks of Internet-connected machines and aimed to disrupt legitimate users’ access to a target network or web resource." },
+            { en: "a malware attack", ru: "хакерская атака", def: "is a cyber-attack where malicious software, commonly known as malware, is used to gain unauthorized access to a computer system or network." },
+            { en: "a social engineering attack", ru: "атака с помощью социальной инженерии", def: "is a type of cyber attack that uses psychological manipulation and lies to trick people into giving up sensitive information or doing things that could compromise security." },
+            { en: "spoofing", ru: "спуфинг (от англ. spoof – подменять, имитировать)", def: "is the creation and use of fake messages, emails, sites, etc." },
+            { en: "phishing", ru: "фишинг («выуживание»)", def: "is a type of social engineering attack and a scam that targets the users by sending fake messages, emails, and links to get sensitive information about them." },
+            { en: "vishing (=voice phishing)", ru: "вишинг (голосовой фишинг)", def: "is the use of fraudulent phone calls to trick victims into providing personal information (login credentials, credit card numbers, or bank details)." },
+            { en: "identity theft", ru: "хищение персональных данных", def: "is stealing somebody’s personal details (login credentials, bank account numbers, etc.)." },
+            { en: "identity fraud", ru: "мошенничество с использованием похищенных персональных данных", def: "is the use of stolen personal details (login credentials, bank account numbers, etc.) to commit fraud." },
+            { en: "cyber extortion", ru: "кибервымогательство, кибершантаж", def: "is the demand for money by cybercriminals to give back some important data they’ve stolen or stop doing malicious activities such as DDoS attacks." },
+            { en: "copyright infringement", ru: "нарушение авторских прав", def: "is the unauthorized use, reproduction, distribution, or adaptation of material protected by copyright law, violating the owner's exclusive rights." },
+            { en: "cryptojacking", ru: "криптоджекинг (майнинг криптовалют с использованием чужих ресурсов)", def: "is the act of exploiting a computer to mine cryptocurrencies, often through websites, against the user's will or while the user is unaware." },
+            { en: "cyber stalking", ru: "киберпреследование, кибердомогательство", def: "is the use of the Internet, social media, or other electronic technologies to repeatedly threaten or intimidate an individual." },
+            { en: "swatting", ru: "сваттинг (от английской аббревиатуры SWAT), заведомо ложное сообщение об опасности", def: "is the action of making hoax phone calls to report serious crimes to police or emergency services." },
+            { en: "cyber espionage", ru: "кибершпионаж", def: "is the unlawful access to government or company data." },
+            { en: "cyber terrorism", ru: "кибертерроризм", def: "is an act of terrorism committed by the use of cyberspace or computers." }
+        ];
+
+        // File 2: Cases
+        const casesData = [
+            { case: "A user receives an email with a link asking to enter a bank password.", answer: "Phishing" },
+            { case: "A computer stops working after downloading a file from an unknown website.", answer: "A malware attack" },
+            { case: "A hoax phone call asks a user to give bank account details.", answer: "Vishing" },
+            { case: "A hacker demands money to unlock important files.", answer: "Cyber extortion" },
+            { case: "A website does not work because of many fake requests.", answer: "A DDoS attack" },
+            { case: "A user receives a fake message from a bank asking to confirm details.", answer: "Phishing" },
+            { case: "A user clicks a link and is sent to a fake website.", answer: "Phishing" },
+            { case: "An employee opens an infected email, and the company network is damaged.", answer: "A malware attack" },
+            { case: "A user receives threatening messages online from an unknown person.", answer: "Cyber stalking" },
+            { case: "A fake emergency call leads police to send a SWAT team.", answer: "Swatting" },
+            { case: "A hacker enters a company system without permission and steals the important information.", answer: "Cyber espionage" },
+            { case: "A user’s computer is used to mine cryptocurrency without permission.", answer: "Cryptojacking" },
+            { case: "A user receives a fake link in social media messages.", answer: "Phishing" },
+            { case: "A criminal uses stolen data to buy things online.", answer: "Identity fraud" },
+            { case: "A hacker blocks access to a company system and demands money.", answer: "Cyber extortion" },
+            { case: "An unknown person gains an unauthorized access to a girl’s smart home devices to spy on her.", answer: "Cyber stalking" },
+            { case: "Hackers use DDoS attacks against computer systems and networks of the state bodies to pressure the government and cause some ideological, political, or social changes.", answer: "Cyber terrorism" },
+            { case: "An unauthorized person gains access to another person’s financial information.", answer: "Identity theft" },
+            { case: "An unknown person reports a fake bomb threat at the university.", answer: "Swatting" },
+            { case: "Scammers use AI to clone the voice of a relative in distress to urgently request money.", answer: "Vishing" }
+        ];
+
+        // Helper: Extract just the English terms for quiz options
+        const allTermsList = termsData.map(t => {
+            // Clean up terms for buttons (remove "a ", "an ", "(=...)")
+            let clean = t.en.replace(/ \(=.*?\)/, '');
+            // Capitalize first letter
+            return clean.charAt(0).toUpperCase() + clean.slice(1);
+        });
+
+        // --- UI NAVIGATION ---
+        const elMenu = document.getElementById('main-menu');
+        const elTerm = document.getElementById('term-container');
+        const elQuiz = document.getElementById('quiz-container');
+        const elResults = document.getElementById('results-container');
+
+        function showMenu() {
+            elMenu.classList.remove('hidden');
+            elTerm.classList.add('hidden');
+            elQuiz.classList.add('hidden');
+            elResults.classList.add('hidden');
+        }
+
+        // --- MODULE 1: TERMINOLOGY LOGIC ---
+        let currentTermIndex = 0;
+
+        function startTerminology() {
+            currentTermIndex = 0;
+            elMenu.classList.add('hidden');
+            elTerm.classList.remove('hidden');
+            loadTerm();
+        }
+
+        function loadTerm() {
+            const data = termsData[currentTermIndex];
+            
+            // Update text
+            document.getElementById('term-en').innerText = data.en;
+            document.getElementById('term-def').innerText = data.def;
+            document.getElementById('term-ru').innerText = data.ru;
+            
+            // Reset UI state
+            document.getElementById('term-ru-container').classList.add('hidden');
+            document.getElementById('term-ru-container').classList.remove('reveal-anim');
+            document.getElementById('btn-reveal').classList.remove('hidden');
+            
+            // Update progress & buttons
+            document.getElementById('term-progress').innerText = `${currentTermIndex + 1}/${termsData.length}`;
+            document.getElementById('btn-prev-term').disabled = currentTermIndex === 0;
+            document.getElementById('btn-next-term').disabled = currentTermIndex === termsData.length - 1;
+        }
+
+        function revealTranslation() {
+            document.getElementById('btn-reveal').classList.add('hidden');
+            const ruContainer = document.getElementById('term-ru-container');
+            ruContainer.classList.remove('hidden');
+            ruContainer.classList.add('reveal-anim');
+        }
+
+        function nextTerm() {
+            if (currentTermIndex < termsData.length - 1) {
+                currentTermIndex++;
+                loadTerm();
+            }
+        }
+
+        function prevTerm() {
+            if (currentTermIndex > 0) {
+                currentTermIndex--;
+                loadTerm();
+            }
+        }
+
+        // --- MODULE 2: QUIZ LOGIC ---
+        let currentQuizIndex = 0;
+        let score = 0;
+        let quizQuestions = [];
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function generateQuizData() {
+            // Create a copy of cases and shuffle them
+            quizQuestions = shuffleArray([...casesData]).map(q => {
+                // Format correct answer to match the list
+                let correctAns = q.answer.charAt(0).toUpperCase() + q.answer.slice(1);
+                
+                // Get 3 random wrong answers
+                let wrongAnswers = allTermsList.filter(t => t.toLowerCase() !== correctAns.toLowerCase());
+                wrongAnswers = shuffleArray(wrongAnswers).slice(0, 3);
+                
+                // Combine and shuffle options
+                let options = shuffleArray([correctAns, ...wrongAnswers]);
+                
+                return {
+                    question: q.case,
+                    correct: correctAns,
+                    options: options
+                };
+            });
+        }
+
+        function startQuiz() {
+            generateQuizData();
+            currentQuizIndex = 0;
+            score = 0;
+            document.getElementById('quiz-score').innerText = `Score: 0`;
+            elMenu.classList.add('hidden');
+            elQuiz.classList.remove('hidden');
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            const q = quizQuestions[currentQuizIndex];
+            document.getElementById('quiz-progress').innerText = `${currentQuizIndex + 1}/${quizQuestions.length}`;
+            document.getElementById('quiz-question').innerText = q.question;
+            
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            q.options.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn bg-slate-800 text-white text-left py-4 px-6 rounded-xl border-2 border-slate-600 text-lg font-medium";
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt, q.correct, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, correct, btnElement) {
+            const allButtons = document.getElementById('quiz-options').children;
+            
+            // Disable all buttons
+            for(let btn of allButtons) { 
+                btn.disabled = true; 
+                btn.classList.remove('hover:border-sky-400');
+            }
+
+            if (selected.toLowerCase() === correct.toLowerCase()) {
+                // Correct
+                score++;
+                document.getElementById('quiz-score').innerText = `Score: ${score}`;
+                btnElement.classList.replace('bg-slate-800', 'bg-emerald-600');
+                btnElement.classList.replace('border-slate-600', 'border-emerald-400');
+                
+                Swal.fire({
+                    title: 'Correct!',
+                    icon: 'success',
+                    background: '#1e293b',
+                    color: '#fff',
+                    timer: 1000,
+                    showConfirmButton: false
+                }).then(() => nextQuizQuestion());
+            } else {
+                // Wrong
+                btnElement.classList.replace('bg-slate-800', 'bg-red-600');
+                btnElement.classList.replace('border-slate-600', 'border-red-400');
+                
+                // Highlight correct answer
+                for(let btn of allButtons) {
+                    if (btn.innerText.toLowerCase() === correct.toLowerCase()) {
+                        btn.classList.replace('bg-slate-800', 'bg-emerald-600');
+                        btn.classList.replace('border-slate-600', 'border-emerald-400');
+                    }
+                }
+
+                Swal.fire({
+                    title: 'Incorrect',
+                    text: `The correct answer is: ${correct}`,
+                    icon: 'error',
+                    background: '#1e293b',
+                    color: '#fff',
+                    confirmButtonColor: '#38bdf8'
+                }).then(() => nextQuizQuestion());
+            }
+        }
+
+        function nextQuizQuestion() {
+            currentQuizIndex++;
+            if (currentQuizIndex < quizQuestions.length) {
+                loadQuizQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            elQuiz.classList.add('hidden');
+            elResults.classList.remove('hidden');
+
+            const percentage = Math.round((score / quizQuestions.length) * 100);
+            
+            document.getElementById('res-score').innerText = `${score}/${quizQuestions.length}`;
+            document.getElementById('res-percent').innerText = `${percentage}% Accuracy`;
+            
+            setTimeout(() => {
+                const bar = document.getElementById('res-bar');
+                bar.style.width = `${percentage}%`;
+                if(percentage >= 80) bar.className = "bg-emerald-500 h-4 rounded-full transition-all duration-1000";
+                else if(percentage >= 50) bar.className = "bg-yellow-500 h-4 rounded-full transition-all duration-1000";
+                else bar.className = "bg-red-500 h-4 rounded-full transition-all duration-1000";
+            }, 100);
+        }
+    </script>
+</body>
+</html>
