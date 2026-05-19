@@ -575,11 +575,8 @@
         ];
 
         function initBoard() {
-            let taskIds = Object.keys(tasks);
-            taskIds.sort(() => Math.random() - 0.5);
-            
-            gridLayout.forEach((cellNum, index) => {
-                cellToTaskMap[cellNum] = taskIds[index];
+            gridLayout.forEach((cellNum) => {
+                cellToTaskMap[cellNum] = cellNum;
             });
 
             const boardEl = document.getElementById('board');
