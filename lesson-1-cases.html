@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 13: Combating Cybercrime</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid #334155;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        .word-btn {
+            transition: all 0.2s ease;
+        }
+        .word-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-10 px-4">
+
+    <!-- Заголовок -->
+    <header class="text-center mb-6">
+        <h1 class="text-4xl font-bold text-sky-400 mb-2 tracking-wider">CYBER POLICE ACADEMY</h1>
+        <p class="text-slate-400 text-lg">Unit 13: Combating Cybercrime</p>
+    </header>
+
+    <!-- HUD (Панель жизней и таймера) -->
+    <div id="game-hud" class="hidden w-full max-w-2xl flex justify-between items-center mb-6 bg-slate-800/80 p-4 rounded-2xl border border-slate-600 shadow-lg">
+        <div class="flex items-center gap-2">
+            <span class="text-slate-400 text-sm uppercase tracking-widest">Integrity:</span>
+            <span id="hud-lives" class="text-2xl tracking-widest">🛡️🛡️🛡️</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-slate-400 text-sm uppercase tracking-widest">Time:</span>
+            <span id="hud-timer" class="text-2xl font-mono font-bold text-sky-400">01:00</span>
+        </div>
+    </div>
+
+    <!-- Главное меню -->
+    <div id="main-menu" class="glass-panel rounded-2xl p-8 w-full max-w-2xl text-center">
+        <h2 class="text-2xl font-semibold mb-6 text-white">Select Training Module:</h2>
+        <div class="flex flex-col gap-4">
+            <button onclick="startQuiz()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold py-4 px-6 rounded-xl text-lg transition-colors border border-sky-400 shadow-[0_0_15px_rgba(2,132,199,0.5)]">
+                🕵️‍♂️ Module 1: Cyber Cases (60s)
+            </button>
+            <button onclick="startGrammar()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-6 rounded-xl text-lg transition-colors border border-indigo-400 shadow-[0_0_15px_rgba(79,70,229,0.5)]">
+                📝 Module 2: Police Reports (90s)
+            </button>
+        </div>
+    </div>
+
+    <!-- Контейнер для Игры 1 (Викторина) -->
+    <div id="quiz-container" class="glass-panel rounded-2xl p-8 w-full max-w-2xl hidden">
+        <div class="flex justify-between items-center mb-6 border-b border-slate-600 pb-4">
+            <h2 class="text-xl font-bold text-sky-400">Case File <span id="quiz-progress">1/4</span></h2>
+            <button onclick="showMenu()" class="text-slate-400 hover:text-white text-sm underline">Abort Mission</button>
+        </div>
+        <p id="quiz-question" class="text-xl mb-8 text-white leading-relaxed"></p>
+        <div id="quiz-options" class="flex flex-col gap-3">
+            <!-- Кнопки ответов -->
+        </div>
+    </div>
+
+    <!-- Контейнер для Игры 2 (Грамматика) -->
+    <div id="grammar-container" class="glass-panel rounded-2xl p-8 w-full max-w-3xl hidden">
+        <div class="flex justify-between items-center mb-6 border-b border-slate-600 pb-4">
+            <h2 class="text-xl font-bold text-indigo-400">Report Builder <span id="grammar-progress">1/5</span></h2>
+            <button onclick="showMenu()" class="text-slate-400 hover:text-white text-sm underline">Abort Mission</button>
+        </div>
+        <p class="text-slate-300 mb-4">Construct the sentence in Passive Voice by clicking the words in the correct order:</p>
+        
+        <div id="constructed-sentence" class="min-h-[60px] bg-slate-800 border-2 border-dashed border-slate-500 rounded-xl p-4 mb-6 flex flex-wrap gap-2 items-center"></div>
+        <div id="available-words" class="flex flex-wrap gap-3 mb-8 justify-center"></div>
+
+        <div class="flex justify-between">
+            <button onclick="resetGrammarSentence()" class="bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded-lg transition-colors">Clear</button>
+            <button onclick="checkGrammar()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-8 rounded-lg transition-colors shadow-[0_0_10px_rgba(5,150,105,0.5)]">Check Report</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН РЕЗУЛЬТАТОВ -->
+    <div id="results-container" class="glass-panel rounded-2xl p-8 w-full max-w-2xl hidden text-center">
+        <h2 class="text-3xl font-bold text-white mb-2">Mission Completed</h2>
+        <p id="res-module" class="text-slate-400 mb-6 text-lg"></p>
+        
+        <!-- Ранг -->
+        <div class="mb-8 bg-slate-800/50 py-4 rounded-xl border border-slate-600">
+            <p class="text-slate-400 text-sm uppercase tracking-widest mb-1">Your Rank</p>
+            <p id="res-rank" class="text-4xl font-bold"></p>
+        </div>
+        
+        <div class="flex justify-center gap-8 mb-8">
+            <div class="bg-slate-800 p-6 rounded-xl border border-slate-600 w-1/3">
+                <p class="text-slate-400 text-sm uppercase tracking-wider mb-1">Score</p>
+                <p id="res-score" class="text-4xl font-bold text-white">0/0</p>
+            </div>
+            <div class="bg-slate-800 p-6 rounded-xl border border-emerald-500/30 w-1/3">
+                <p class="text-slate-400 text-sm uppercase tracking-wider mb-1">Correct</p>
+                <p id="res-correct" class="text-4xl font-bold text-emerald-400">0</p>
+            </div>
+            <div class="bg-slate-800 p-6 rounded-xl border border-red-500/30 w-1/3">
+                <p class="text-slate-400 text-sm uppercase tracking-wider mb-1">Incorrect</p>
+                <p id="res-incorrect" class="text-4xl font-bold text-red-400">0</p>
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <p class="text-slate-400 mb-2">Accuracy</p>
+            <div class="w-full bg-slate-700 rounded-full h-4 mb-1">
+                <div id="res-bar" class="bg-sky-500 h-4 rounded-full transition-all duration-1000" style="width: 0%"></div>
+            </div>
+            <p id="res-percent" class="text-right text-sm text-sky-400 font-bold">0%</p>
+        </div>
+
+        <button onclick="showMenu()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-8 rounded-xl transition-colors border border-slate-500">
+            Return to Main Menu
+        </button>
+    </div>
+
+    <script>
+        // --- ДАННЫЕ ---
+        const quizData = [
+            { question: "A criminal locks a user's files and demands Bitcoin to unlock them. What type of attack is this?", options: ["Ransomware", "Phishing", "Swatting", "Cyber espionage"], correct: 0 },
+            { question: "Criminals use a network of infected IoT devices (botnet) to crash a website by overwhelming it with traffic.", options: ["Vishing", "Identity fraud", "DDoS attack", "Cryptojacking"], correct: 2 },
+            { question: "An employee receives a fake email from the 'CEO' asking to click a link and enter passwords.", options: ["Malware", "Spear-phishing", "Cyber terrorism", "Spoofing"], correct: 1 },
+            { question: "A criminal calls the victim on the phone pretending to be from a bank to steal credit card details.", options: ["Swatting", "Cyber extortion", "DDoS attack", "Vishing"], correct: 3 }
+        ];
+
+        const grammarData = [
+            { correct: "The case of murder was investigated last year.", words: ["investigated", "The", "murder", "of", "case", "was", "year.", "last"] },
+            { correct: "The suspect has just been arrested by the police.", words: ["arrested", "The", "just", "suspect", "been", "has", "police.", "by", "the"] },
+            { correct: "This terrible crime was prevented by the police.", words: ["This", "crime", "prevented", "terrible", "was", "police.", "by", "the"] },
+            { correct: "The evidence is still being collected by the investigator.", words: ["evidence", "is", "being", "The", "collected", "still", "investigator.", "by", "the"] },
+            { correct: "Penalties are imposed on convicts according to the law.", words: ["are", "imposed", "Penalties", "convicts", "on", "law.", "according", "to", "the"] }
+        ];
+
+        // --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ---
+        let correctAnswers = 0;
+        let incorrectAnswers = 0;
+        let currentModuleName = '';
+        
+        // Игровые механики
+        let lives = 3;
+        let timeLeft = 0;
+        let timerInterval;
+
+        // --- ЛОГИКА ИНТЕРФЕЙСА ---
+        const elMenu = document.getElementById('main-menu');
+        const elQuiz = document.getElementById('quiz-container');
+        const elGrammar = document.getElementById('grammar-container');
+        const elResults = document.getElementById('results-container');
+        const elHud = document.getElementById('game-hud');
+
+        function showMenu() {
+            clearInterval(timerInterval);
+            elMenu.classList.remove('hidden');
+            elQuiz.classList.add('hidden');
+            elGrammar.classList.add('hidden');
+            elResults.classList.add('hidden');
+            elHud.classList.add('hidden');
+        }
+
+        // --- ИГРОВЫЕ МЕХАНИКИ (ТАЙМЕР И ЖИЗНИ) ---
+        function startGameMechanics(seconds) {
+            lives = 3;
+            timeLeft = seconds;
+            elHud.classList.remove('hidden');
+            updateHUD();
+            
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateHUD();
+                if (timeLeft <= 0) {
+                    triggerGameOver('time');
+                }
+            }, 1000);
+        }
+
+        function updateHUD() {
+            // Обновление таймера
+            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const s = (timeLeft % 60).toString().padStart(2, '0');
+            const timerEl = document.getElementById('hud-timer');
+            timerEl.innerText = `${m}:${s}`;
+
+            if (timeLeft <= 10) {
+                timerEl.classList.add('text-red-500', 'animate-pulse');
+                timerEl.classList.remove('text-sky-400');
+            } else {
+                timerEl.classList.remove('text-red-500', 'animate-pulse');
+                timerEl.classList.add('text-sky-400');
+            }
+
+            // Обновление жизней
+            let shields = '';
+            for(let i=0; i<3; i++) {
+                shields += i < lives ? '🛡️' : '❌';
+            }
+            document.getElementById('hud-lives').innerText = shields;
+        }
+
+        function triggerGameOver(reason) {
+            clearInterval(timerInterval);
+            let title = reason === 'time' ? "Time's Up!" : "Mission Failed!";
+            let text = reason === 'time' ? "The hackers escaped." : "System integrity compromised.";
+            
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: 'error',
+                background: '#1e293b',
+                color: '#fff',
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'Return to Base'
+            }).then(() => {
+                showMenu();
+            });
+        }
+
+        // --- ЭКРАН РЕЗУЛЬТАТОВ ---
+        function showResults(totalQuestions) {
+            clearInterval(timerInterval);
+            elHud.classList.add('hidden');
+            elQuiz.classList.add('hidden');
+            elGrammar.classList.add('hidden');
+            elResults.classList.remove('hidden');
+
+            const percentage = Math.round((correctAnswers / totalQuestions) * 100);
+
+            // Определение ранга
+            let rank = "";
+            let rankColor = "";
+            if (percentage === 100) { rank = "Cyber Ninja 🥷"; rankColor = "text-purple-400"; }
+            else if (percentage >= 80) { rank = "Senior Detective 🕵️‍♂️"; rankColor = "text-sky-400"; }
+            else if (percentage >= 50) { rank = "Rookie 👮"; rankColor = "text-yellow-400"; }
+            else { rank = "Fired 📦"; rankColor = "text-red-500"; }
+
+            document.getElementById('res-rank').innerText = rank;
+            document.getElementById('res-rank').className = `text-4xl font-bold ${rankColor}`;
+
+            document.getElementById('res-module').innerText = currentModuleName;
+            document.getElementById('res-score').innerText = `${correctAnswers}/${totalQuestions}`;
+            document.getElementById('res-correct').innerText = correctAnswers;
+            document.getElementById('res-incorrect').innerText = incorrectAnswers;
+            document.getElementById('res-percent').innerText = `${percentage}%`;
+            
+            setTimeout(() => {
+                const bar = document.getElementById('res-bar');
+                bar.style.width = `${percentage}%`;
+                if(percentage >= 80) bar.className = "bg-emerald-500 h-4 rounded-full transition-all duration-1000";
+                else if(percentage >= 50) bar.className = "bg-yellow-500 h-4 rounded-full transition-all duration-1000";
+                else bar.className = "bg-red-500 h-4 rounded-full transition-all duration-1000";
+            }, 100);
+        }
+
+        // --- ЛОГИКА ВИКТОРИНЫ (QUIZ) ---
+        let currentQuizIndex = 0;
+
+        function startQuiz() {
+            currentQuizIndex = 0;
+            correctAnswers = 0;
+            incorrectAnswers = 0;
+            currentModuleName = 'Module 1: Cyber Cases';
+            elMenu.classList.add('hidden');
+            elQuiz.classList.remove('hidden');
+            startGameMechanics(60); // 60 секунд на викторину
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            const q = quizData[currentQuizIndex];
+            document.getElementById('quiz-progress').innerText = `${currentQuizIndex + 1}/${quizData.length}`;
+            document.getElementById('quiz-question').innerText = q.question;
+            
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = "bg-slate-700 hover:bg-sky-600 text-left text-white py-3 px-5 rounded-lg transition-colors border border-slate-600 hover:border-sky-400 text-lg";
+                btn.innerText = opt;
+                btn.onclick = () => checkQuizAnswer(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkQuizAnswer(selectedIndex, btnElement) {
+            const correctIndex = quizData[currentQuizIndex].correct;
+            const allButtons = document.getElementById('quiz-options').children;
+            
+            for(let btn of allButtons) { btn.disabled = true; }
+
+            if (selectedIndex === correctIndex) {
+                correctAnswers++;
+                btnElement.classList.replace('bg-slate-700', 'bg-emerald-600');
+                btnElement.classList.replace('hover:bg-sky-600', 'bg-emerald-600');
+                
+                Swal.fire({
+                    title: 'Correct!',
+                    icon: 'success',
+                    background: '#1e293b',
+                    color: '#fff',
+                    timer: 1000,
+                    showConfirmButton: false
+                }).then(() => nextQuizQuestion());
+            } else {
+                incorrectAnswers++;
+                lives--;
+                updateHUD();
+                
+                btnElement.classList.replace('bg-slate-700', 'bg-red-600');
+                allButtons[correctIndex].classList.replace('bg-slate-700', 'bg-emerald-600');
+                
+                if (lives <= 0) {
+                    setTimeout(() => triggerGameOver('lives'), 500);
+                } else {
+                    Swal.fire({
+                        title: 'Wrong!',
+                        icon: 'error',
+                        background: '#1e293b',
+                        color: '#fff',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => nextQuizQuestion());
+                }
+            }
+        }
+
+        function nextQuizQuestion() {
+            currentQuizIndex++;
+            if (currentQuizIndex < quizData.length) {
+                loadQuizQuestion();
+            } else {
+                showResults(quizData.length);
+            }
+        }
+
+        // --- ЛОГИКА ГРАММАТИКИ (GRAMMAR) ---
+        let currentGrammarIndex = 0;
+        let selectedWords = [];
+        let availableWords = [];
+
+        function startGrammar() {
+            currentGrammarIndex = 0;
+            correctAnswers = 0;
+            incorrectAnswers = 0;
+            currentModuleName = 'Module 2: Police Reports';
+            elMenu.classList.add('hidden');
+            elGrammar.classList.remove('hidden');
+            startGameMechanics(90); // 90 секунд на грамматику
+            loadGrammarSentence();
+        }
+
+        function loadGrammarSentence() {
+            selectedWords = [];
+            availableWords = [...grammarData[currentGrammarIndex].words].sort(() => Math.random() - 0.5);
+            document.getElementById('grammar-progress').innerText = `${currentGrammarIndex + 1}/${grammarData.length}`;
+            renderGrammarUI();
+        }
+
+        function renderGrammarUI() {
+            const constContainer = document.getElementById('constructed-sentence');
+            const availContainer = document.getElementById('available-words');
+            
+            constContainer.innerHTML = '';
+            availContainer.innerHTML = '';
+
+            selectedWords.forEach((word, index) => {
+                const btn = document.createElement('button');
+                btn.className = "word-btn bg-indigo-600 text-white py-2 px-4 rounded-lg cursor-pointer shadow-md";
+                btn.innerText = word;
+                btn.onclick = () => moveWordToAvailable(index);
+                constContainer.appendChild(btn);
+            });
+
+            availableWords.forEach((word, index) => {
+                const btn = document.createElement('button');
+                btn.className = "word-btn bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded-lg cursor-pointer border border-slate-500";
+                btn.innerText = word;
+                btn.onclick = () => moveWordToConstructed(index);
+                availContainer.appendChild(btn);
+            });
+        }
+
+        function moveWordToConstructed(index) {
+            selectedWords.push(availableWords[index]);
+            availableWords.splice(index, 1);
+            renderGrammarUI();
+        }
+
+        function moveWordToAvailable(index) {
+            availableWords.push(selectedWords[index]);
+            selectedWords.splice(index, 1);
+            renderGrammarUI();
+        }
+
+        function resetGrammarSentence() {
+            availableWords = availableWords.concat(selectedWords);
+            selectedWords = [];
+            renderGrammarUI();
+        }
+
+        function checkGrammar() {
+            const userSentence = selectedWords.join(" ");
+            const correctSentence = grammarData[currentGrammarIndex].correct;
+
+            if (userSentence === correctSentence) {
+                correctAnswers++;
+                Swal.fire({
+                    title: 'Report Approved!',
+                    icon: 'success',
+                    background: '#1e293b',
+                    color: '#fff',
+                    timer: 1200,
+                    showConfirmButton: false
+                }).then(() => nextGrammarSentence());
+            } else {
+                incorrectAnswers++;
+                lives--;
+                updateHUD();
+
+                if (lives <= 0) {
+                    triggerGameOver('lives');
+                } else {
+                    Swal.fire({
+                        title: 'Report Rejected!',
+                        html: `Incorrect structure.<br><br>Correct answer:<br><b style="color:#38bdf8; font-size: 1.1em;">${correctSentence}</b>`,
+                        icon: 'error',
+                        background: '#1e293b',
+                        color: '#fff',
+                        confirmButtonColor: '#4f46e5',
+                        confirmButtonText: 'Understood'
+                    }).then(() => nextGrammarSentence());
+                }
+            }
+        }
+
+        function nextGrammarSentence() {
+            currentGrammarIndex++;
+            if (currentGrammarIndex < grammarData.length) {
+                loadGrammarSentence();
+            } else {
+                showResults(grammarData.length);
+            }
+        }
+    </script>
+</body>
+</html>
